@@ -5,10 +5,14 @@ import com.example.testproject1.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/v1/product-api")
 public class ProductController {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
     private ProductService productService;
 
     @Autowired
@@ -19,7 +23,19 @@ public class ProductController {
     // http://localhost:8080/api/v1/product-api/product/{productId}
     @GetMapping(value = "/product/{productId}")
     public ProductDto getProduct(@PathVariable String productId) {
-        return productService.getProduct(productId);
+
+        long startTime = System.currentTimeMillis();
+
+        // info 레벨로 로그 찍기.
+        LOGGER.info("[ProductController] perform {} of Around Hub API.", "getProduct");
+
+        ProductDto productDto = productService.getProduct(productId);  // 서비스 처리
+
+        // 서비스가 처리 된 이후 로그
+        LOGGER.info("[ProductController] Response :: productId = {}, productName = {}, productPrice = {}, productStock = {}," +
+                "Response Time = {}ms", productDto.getProductId(), productDto.getProductName(), productDto.getProductPrice(),
+                productDto.getProductStock(), (System.currentTimeMillis() - startTime));
+        return productDto;
     }
 
     // http://localhost:8080/api/v1/product-api/product
