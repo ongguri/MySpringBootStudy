@@ -1,4 +1,4 @@
-package com.example.testproject1.exception;
+package com.example.testproject1.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,4 +32,16 @@ public class AroundHubExceptionHandler {
         return new ResponseEntity<>(map, responseHeaders, httpStatus);
     } // 특정 controller 의 예외처리를 하기 위해 만들어진 ExceptionHandler 가 우선으로 잡혀서 처리된다.
     // 특정 controller 의 예외처리가 따로 없다면 해당 ExceptionHandler 가 실행된다.
+
+    @ExceptionHandler(value = AroundHubException.class)
+    public ResponseEntity<Map<String, String>> ExceptionHandler(AroundHubException e) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+
+        Map<String, String> map = new HashMap<>();
+        map.put("error type", e.getHttpStatusType());
+        map.put("code", Integer.toString(e.getHttpStatusCode()));
+        map.put("message", e.getMessage());
+
+        return new ResponseEntity<>(map, responseHeaders, e.getHttpStatus());
+    }
 }

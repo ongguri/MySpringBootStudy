@@ -1,5 +1,7 @@
 package com.example.testproject1.controller;
 
+import com.example.testproject1.common.Constants;
+import com.example.testproject1.common.exception.AroundHubException;
 import com.example.testproject1.data.dto.ProductDto;
 import com.example.testproject1.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,5 +78,11 @@ public class ProductController {
     @DeleteMapping(value = "/product/{productId}")
     public ProductDto deleteProduct(@PathVariable String productId) {
         return null;
+    }
+
+    @PostMapping(value = "/product/exception")
+    public void exceptionTest() throws AroundHubException {
+//        throw new AroundHubException(Constants.ExceptionClass.PRODUCT, HttpStatus.BAD_REQUEST, "의도한 에러가 발생했습니다.");
+        throw new AroundHubException(Constants.ExceptionClass.PRODUCT, HttpStatus.FORBIDDEN, "접근이 금지되었습니다.");
     }
 }
