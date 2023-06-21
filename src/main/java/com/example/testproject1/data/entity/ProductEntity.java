@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Builder
 @Table(name = "product")
-public class ProductEntity {
+public class ProductEntity extends BaseEntity {
 
     @Id
     String productId;
