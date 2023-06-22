@@ -13,6 +13,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Table(name = "product")
 public class ProductEntity extends BaseEntity {
 
