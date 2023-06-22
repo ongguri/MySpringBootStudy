@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -18,16 +20,16 @@ public class ProductRepositoryTest {
     @BeforeEach  // 테스트 전에 실행되면서 값을 저장
     void GenerateData() {
         int count = 1;
-        productRepository.save(getProduct(Integer.toString(count), count++, 2000, 3000)); // 각각 id, 상품 넘버, price, stock
-        productRepository.save(getProduct(Integer.toString(count), count++, 3000, 9000));
-        productRepository.save(getProduct(Integer.toString(--count), count = count + 2, 1500, 200));  // 공통되는 값을 위한 변형
-        productRepository.save(getProduct(Integer.toString(count), count++, 4000, 5000));
+        productRepository.save(getProduct(Integer.toString(count), count++, 2000, 3000));
+        productRepository.save(getProduct(Integer.toString(count), count++, 3000, 3000));
+        productRepository.save(getProduct(Integer.toString(--count), count = count + 2, 1500, 200));
+        productRepository.save(getProduct(Integer.toString(count), count++, 4000, 3000));
         productRepository.save(getProduct(Integer.toString(count), count++, 10000, 1500));
-        productRepository.save(getProduct(Integer.toString(count), count++, 1000, 1000));
+        productRepository.save(getProduct(Integer.toString(count), count++, 10000, 1000));
         productRepository.save(getProduct(Integer.toString(count), count++, 500, 10000));
         productRepository.save(getProduct(Integer.toString(count), count++, 8500, 3500));
-        productRepository.save(getProduct(Integer.toString(count), count++, 7200, 2000));
-        productRepository.save(getProduct(Integer.toString(count), count++, 5100, 1700));
+        productRepository.save(getProduct(Integer.toString(count), count++, 1000, 2000));
+        productRepository.save(getProduct(Integer.toString(count), count, 5100, 1700));
     }
 
     private ProductEntity getProduct(String id, int nameNumber, int price, int stock) {
@@ -199,5 +201,98 @@ public class ProductRepositoryTest {
         System.out.println("=== Test Data end ===");
 
         System.out.println(productRepository.findByProductNameContaining("상품1"));  // 상품10 도 포함됨. 상품1 문자열이 포함되어 있기 때문.
+    }
+
+
+    // 정렬과 페이징
+    @Test
+    void orderByTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        // ProductStock 오름차순
+        List<ProductEntity> foundProducts = productRepository.findByProductNameContainingOrderByProductStockAsc("상품");
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+
+        // ProductStock 내림차순
+        foundProducts = productRepository.findByProductNameContainingOrderByProductStockDesc("상품");
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    void multiOrderByTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        // productPrice 오름차순 후 productStock 내림차순
+        List<ProductEntity> foundProducts = productRepository.findByProductNameContainingOrderByProductPriceAscProductStockDesc("상품");
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    void orderByWithParameterTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductNameContaining(
+                "상품", Sort.by(Sort.Order.asc("productPrice")));  // property 명은 엔티티명과 동일하게.
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+
+        foundProducts = productRepository.findByProductNameContaining("상품",
+                Sort.by(Sort.Order.asc("productPrice"), Sort.Order.asc("productStock")));
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    void pagingTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceGreaterThan(200,
+                PageRequest.of(0, 2));  // 첫번째 페이지를 가져오고 사이즈는 2로 하겠다는 의미
+
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+
+        foundProducts = productRepository.findByProductPriceGreaterThan(200,
+                PageRequest.of(2, 2));  // 두번째 페이지를 가져오고 사이즈는 2로 하겠다는 의미
+
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+
+        foundProducts = productRepository.findByProductPriceGreaterThan(200,
+                PageRequest.of(4, 2));  // 네번째 페이지를 가져오고 사이즈는 2로 하겠다는 의미
+
+        for(ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
     }
 }

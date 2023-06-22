@@ -1,6 +1,8 @@
 package com.example.testproject1.data.repository;
 
 import com.example.testproject1.data.entity.ProductEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -54,4 +56,19 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
     // (Is)Like, (Is)Containing, (Is)StartingWith, (Is)EndingWith
     List<ProductEntity> findByProductNameContaining(String name);
 
+
+    /* 정렬과 페이징 */
+
+    // Asc : 오름차순, Desc : 내림차순
+    List<ProductEntity> findByProductNameContainingOrderByProductStockAsc(String name);
+    List<ProductEntity> findByProductNameContainingOrderByProductStockDesc(String name);
+
+    // 여러 정렬 기준 사용
+    List<ProductEntity> findByProductNameContainingOrderByProductPriceAscProductStockDesc(String name);
+
+    // 매개변수를 활용한 정렬
+    List<ProductEntity> findByProductNameContaining(String name, Sort sort);
+
+    // 페이징 처리하기
+    List<ProductEntity> findByProductPriceGreaterThan(Integer price, Pageable pageable);
 }
