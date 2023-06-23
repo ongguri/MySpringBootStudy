@@ -4,9 +4,11 @@ import com.example.testproject1.data.dao.ShortUrlDAO;
 import com.example.testproject1.data.dto.NaverUrlDto;
 import com.example.testproject1.data.dto.ShortUrlResponseDto;
 import com.example.testproject1.data.entity.ShortUrlEntity;
+import com.example.testproject1.data.repository.ShortUrlRedisRepository;
 import com.example.testproject1.service.ShortUrlService;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +23,28 @@ public class ShortUrlServiceImpl implements ShortUrlService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ShortUrlServiceImpl.class);
     private final ShortUrlDAO shortUrlDAO;
+    private final ShortUrlRedisRepository shortUrlRedisRepository;
 
     @Autowired
-    public ShortUrlServiceImpl(ShortUrlDAO shortUrlDAO) {
+    public ShortUrlServiceImpl(ShortUrlDAO shortUrlDAO, ShortUrlRedisRepository shortUrlRedisRepository) {
         this.shortUrlDAO = shortUrlDAO;
+        this.shortUrlRedisRepository = shortUrlRedisRepository;
     }
     @Override
     public ShortUrlResponseDto getShortUrl(String clientId, String clientSecret,
         String originalUrl) {
 
         LOGGER.info("[getShortUrl] request data : {}", originalUrl);
+
+        // Cache Logic
+        Optional<ShortUrlResponseDto> foundResponseDto = shortUrlRedisRepository.findById(originalUrl);
+        if(foundResponseDto.isPresent()) {
+            LOGGER.info("[getShortUrl] Cache Data is existed.");
+            return foundResponseDto.get();  // 캐시가 있을 땐, 밑에 있는 로직이 실행되지 않음
+        } else {
+            LOGGER.info("[getShortUrl] Cache Data does not existed.");
+        }
+
         ShortUrlEntity getShortUrlEntity = shortUrlDAO.getShortUrl(originalUrl);
 
         String orgUrl;
@@ -76,6 +90,11 @@ public class ShortUrlServiceImpl implements ShortUrlService {
         shortUrlDAO.saveShortUrl(shortUrlEntity);
 
         ShortUrlResponseDto shortUrlResponseDto = new ShortUrlResponseDto(orgUrl, shortUrl);
+
+        // Cache Logic
+        shortUrlRedisRepository.save(shortUrlResponseDto);
+        // redis 는 키와 값의 쌍으로 이뤄져 있는데 Dto 의 @Id 어노테이션이 붙은 값이 키가 되고, shortUrlResponseDto 가 값이 된다.
+
         LOGGER.info("[generateShortUrl] Response DTO : {}", shortUrlResponseDto.toString());
 
         return shortUrlResponseDto;
