@@ -14,6 +14,11 @@ public class HttpInterceptor implements HandlerInterceptor {
 
     private final Logger LOGGER = LoggerFactory.getLogger(HttpInterceptor.class);
 
+    /*
+    컨트롤러로 요청이 가기 전에 수행할 코드를 작성한느 메서드
+    return 값이 true 일 경우 컨트롤러로 요청을 전달하고 false 일 경우 컨트롤러로 전달하지 않음
+    object handler : 요청을 전달할 컨트롤러 객체가 담겨있음
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         LOGGER.info("[preHandle] preHandle is performed");
@@ -29,6 +34,7 @@ public class HttpInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    // 컨트롤러의 로직이 수행된 이후 view 가 렌더링 되기 전에 수행할 코드를 작성하는 메서드
     @Override
     public void  postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         LOGGER.info("[postHandle] postHandle is performed");
@@ -37,6 +43,7 @@ public class HttpInterceptor implements HandlerInterceptor {
         LOGGER.info("[postHandle] response : {}", response.getHeaderNames());
     }
 
+    // view 가 렌더링 된 후에 실행되는 메서드
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         LOGGER.info("[afterCompletion] afterCompletion is performed");
