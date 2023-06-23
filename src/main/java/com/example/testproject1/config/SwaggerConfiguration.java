@@ -10,15 +10,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-/**
- * @package : studio.thinkground.aroundhub.config
- * @name : SwaggerConfiguration.java
- * @date : 2022-01-28 오후 4:34
- * @author : Flature
- * @version : 1.0.0
- **/
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
 
     private static final String API_NAME = "Programmers Spring Boot Application";
