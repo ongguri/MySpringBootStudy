@@ -4,6 +4,8 @@ import com.example.testproject1.data.entity.ProductEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -71,4 +73,28 @@ public interface ProductRepository extends JpaRepository<ProductEntity, String> 
 
     // 페이징 처리하기
     List<ProductEntity> findByProductPriceGreaterThan(Integer price, Pageable pageable);
+
+
+    /* @Query 사용하기 */
+    @Query("SELECT p FROM ProductEntity p WHERE p.productPrice > 2000")
+    List<ProductEntity> findByProductPriceBasis();
+
+    @Query(value = "SELECT * FROM product p WHERE p.product_price > 2000", nativeQuery = true)  // 테이블로 만들어진 컬럼 명 그대로 작성
+    // Hibernate 로 출력된 쿼리문도 value 그대로 나온다.
+    List<ProductEntity> findByProductPriceBasisNativeQuery();
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.productPrice > ?1")  // price 를 ?1 부분에 주입받는 형식
+    List<ProductEntity> findByProductPriceWithParameter(Integer price);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.productPrice > :price")  // price 를 :price 에 주입받는 형식
+    List<ProductEntity> findByProductPriceWithParameterNaming(Integer price);
+
+    @Query("SELECT p FROM ProductEntity p WHERE p.productPrice > :pri")  // 이름을 맞춰줄 수 없을 때 @Param 어노테이션으로 이름을 맞출 수 있다.
+    List<ProductEntity> findByProductPriceWithParameterNaming2(@Param("pri") Integer price);
+
+    @Query(value = "SELECT * FROM product WHERE product_price > :price",
+            countQuery = "SELECT count(*) FROM productEntity WHERE productPrice > ?1",
+            nativeQuery = true)  // countQuery : paging 처리 할 때 몇 페이지인지, 페이지 마다의 사이즈를 설정하는데 그걸 참고할 쿼리
+    List<ProductEntity> findByProductPriceWithParameterPaging(Integer price, Pageable pageable);
+
 }

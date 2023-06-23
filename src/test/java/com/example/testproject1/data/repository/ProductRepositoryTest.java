@@ -295,4 +295,99 @@ public class ProductRepositoryTest {
             System.out.println(productEntity);
         }
     }
+
+    // @Query 사용하기
+    @Test
+    public void queryTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceBasis();  // 설정한 쿼리(price 이상)의 값을 조회
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    public void nativeQueryTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceBasisNativeQuery();
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    public void parameterQueryTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceWithParameter(2000);
+        // 파라미터로 값을 받고 있기 때문에 쿼리문에 ?1 에 값이 들어가고 hibernate 결과에 ? 로 표시된다.
+        // 시큐어 코드 중 하나. 민감정보를 숨길 수 있는 방식 중 하나이다.
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    public void parameterNamingQueryTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceWithParameterNaming(2000);
+        // 1? 로 쿼리를 작성했을때와 같은 결과가 나온다.
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    public void parameterNamingQueryTest2() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceWithParameterNaming2(2000);
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
+
+    @Test
+    public void nativeQueryPagingTest() {
+        List<ProductEntity> foundAll = productRepository.findAll();
+        System.out.println("=== Test Data Start ===");
+        for(ProductEntity productEntity : foundAll) {
+            System.out.println(productEntity.toString());
+        }
+        System.out.println("=== Test Data end ===");
+
+        List<ProductEntity> foundProducts = productRepository.findByProductPriceWithParameterPaging(2000,
+                PageRequest.of(2, 2));
+        for (ProductEntity productEntity : foundProducts) {
+            System.out.println(productEntity);
+        }
+    }
 }
